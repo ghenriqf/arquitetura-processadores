@@ -1,80 +1,67 @@
-# Disciplina: Arquitetura e Organização de Processadores
-# Atividade: Avaliação 01 – Programação em Linguagem de Montagem
-# Programa 01
-# Nome: Gabriel Henrique de Freitas e João Matheus Cachoeira
-
 .data
-	vetor_dias:
-	        .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-	        .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-	        .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-	        .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-	        
-	msg_entrada_a: .asciz "Entre com o número da aula (de 0 a 15):"
-        
-	msg_entrada_b: .asciz "Entre com o número do aluno (de 0 a 31):"
-	
-	msg_entrada_c: .asciz "Entre com o tipo do registro (presença = 1; ausência = 0):"
-	
-	msg_entrada_d: .asciz "Digite 99 se quiser encerrar:"
-        
+vetor_dias:
+    .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+    .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+    .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+    .word 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+
+msg_entrada_a: .asciz "Entre com o numero da aula (de 0 a 15) ou 99 para sair: "
+msg_entrada_b: .asciz "Entre com o numero do aluno (de 0 a 31): "
+msg_entrada_c: .asciz "Entre com o tipo de registro (presenca = 1; ausencia = 0): "
+
 .text
-	addi t1, zero, 99 # guarda valor de condição para encerramento do programa
-	addi a0, zero, 0 # garante que a0 não guarde lixo de memoria
-	
-	while:
-		beq t1, a0, fim_while # se o valor digitado for 99 encerra
-    		
-    		#  comandos para escrever string no console
-		addi a7, zero, 4
-		la a0, msg_entrada_a
-		ecall
-		
-		# comandos para executar leitura de um valor inteiro no console
-		addi a7, zero, 5
-		ecall
-		add s0, zero, a0
-		
-		la t0, vetor_dias
-		slli t1, s0, 2
-		add t2, t0, t1
-		lw t3, 0(t2)
-		
-		
-		
-		
-		#  comandos para escrever string no console
-		addi a7, zero, 4
-		la a0, msg_entrada_b
-		ecall
-		
-		# comandos para executar leitura de um valor inteiro no console
-		addi a7, zero, 5
-		ecall
-		add s0, zero, a0
-		
-		#  comandos para escrever string no console
-		addi a7, zero, 4
-		la a0, msg_entrada_c
-		ecall
-		
-		# comandos para executar leitura de um valor inteiro no console
-		addi a7, zero, 5
-		ecall
-		add s0, zero, a0
-		
-		#  comandos para escrever string no console
-		addi a7, zero, 4
-		la a0, msg_entrada_d
-		ecall
-		
-		# comandos para executar leitura de um valor inteiro no console
-		addi a7, zero, 5
-		ecall
-		add s0, zero, a0
-		
-		    
-		jal zero, while # salta para o começo do while
-		
-	fim_while:
-		nop
+    addi t6, zero, 99   # valor de parada
+
+while:
+    # ðŸ”¹ ler dia
+    addi a7, zero, 4
+    la a0, msg_entrada_a
+    ecall
+
+    addi a7, zero, 5
+    ecall
+    add s0, zero, a0   # s0 = dia
+
+    # ðŸ”¹ verificar saÃ­da
+    beq s0, t6, fim_while
+
+    # ðŸ”¹ ler aluno
+    addi a7, zero, 4
+    la a0, msg_entrada_b
+    ecall
+
+    addi a7, zero, 5
+    ecall
+    add s1, zero, a0   # s1 = aluno
+
+    # ðŸ”¹ ler tipo (1 ou 0)
+    addi a7, zero, 4
+    la a0, msg_entrada_c
+    ecall
+
+    addi a7, zero, 5
+    ecall
+    add s2, zero, a0   # s2 = tipo
+
+    # ðŸ”¹ acessar vetor_dias[dia]
+    la t0, vetor_dias
+    slli t1, s0, 2      # dia * 4
+    add  t2, t0, t1     # endereÃ§o do dia
+    lw   t3, 0(t2)      # valor do dia
+
+    # ðŸ”¹ criar mÃ¡scara (1 << aluno)
+    addi t4, zero, 1
+    sll  t4, t4, s1
+
+    # ðŸ”¹ se for falta (0), faz XOR
+    bne s2, zero, salvar   # se for 1 â†’ nÃ£o faz nada
+    xor t3, t3, t4         # se for 0 â†’ alterna (vira falta)
+
+salvar:
+    sw t3, 0(t2)
+
+    j while
+
+fim_while:
+    addi a7, zero, 10
+    ecall
