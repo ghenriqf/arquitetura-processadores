@@ -12,12 +12,12 @@ fatorial:
 	
 	
 fatorial_while:
-	beq	a7, zero, fatorial_fim
+	beq		a7, zero, fatorial_fim
 	
-	mul	a0, a0, a7
+	mul		a0, a0, a7
 	addi	a7, a7, -1
 	
-	jal	zero, fatorial_while
+	jal		zero, fatorial_while
 	
 fatorial_fim
-	jal	zero, ra, 0
+	jal		zero, ra, 0
