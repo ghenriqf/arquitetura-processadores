@@ -1,7 +1,7 @@
 # Disciplina: Arquitetura e Organização de Processadores
 # Atividade: Prática 01 – Programação de procedimentos em linguagem de montagem
 # Programa 02
-# Grupo: Gabriel Henrique de Freitas 
+# Grupo: Gabriel Henrique de Freitas e João Matheus Cachoeira
  
     .text
     jal     zero, main
