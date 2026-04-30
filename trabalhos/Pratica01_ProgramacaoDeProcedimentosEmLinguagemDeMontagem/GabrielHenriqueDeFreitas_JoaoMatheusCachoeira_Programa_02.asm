@@ -2,58 +2,71 @@
 # Atividade: Prática 01 – Programação de procedimentos em linguagem de montagem
 # Programa 02
 # Grupo: Gabriel Henrique de Freitas e João Matheus Cachoeira
- 
+
     .text
     jal     zero, main
 
-fatorial:
-    addi    a0, zero, 1         
+ehprimo:
+    addi    sp, sp, -12
+    sw      ra, 0(sp)
+    sw      s0, 4(sp)
+    sw      s1, 8(sp)
 
-fatorial_loop:
-    beq     t0, zero, fatorial_fim   
+    addi    s0, zero, 2      
+    addi    s1, a0, 0        
 
-    mul     a0, a0, t0           
-    addi    t0, t0, -1           
+ehprimo_loop:
+    bge     s0, s1, ehprimo_fim
 
-    jal     zero, fatorial_loop  
+    addi    a7, s0, 0        
+    jal     ra, resto_divisao
 
-fatorial_fim:
-    jalr    zero, ra, 0                    
+    beq     a0, zero, numero_nao_primo
 
+    addi    s0, s0, 1
+    jal     zero, ehprimo_loop
 
-arranjo:
-    addi    sp, sp, -12          # reserva espaço na stack
-    sw      ra, 0(sp)            # salva ra
-    sw      s0, 4(sp)            # salva s0
-    sw      s1, 8(sp)            # salva s1
-
-    # calcula n!
-    addi    t0, a2, 0            # t0 = n
-    jal     ra, fatorial
-    addi    s0, a0, 0            # s0 = n!
-
-    # calcula (n - p)!
-    sub     t0, a2, a3           # t0 = n - p
-    jal     ra, fatorial
-    addi    s1, a0, 0            # s1 = (n-p)!
-
-    # divisão final
-    div     a0, s0, s1           # a0 = n! / (n-p)!
-
-    # restaura registradores
+numero_nao_primo:
     lw      ra, 0(sp)
     lw      s0, 4(sp)
     lw      s1, 8(sp)
     addi    sp, sp, 12
 
-    jalr    zero, ra, 0          # return
-          
+    addi    a0, zero, 0
+    jalr    zero, ra, 0
+
+ehprimo_fim:
+    lw      ra, 0(sp)
+    lw      s0, 4(sp)
+    lw      s1, 8(sp)
+    addi    sp, sp, 12
+
+    addi    a0, zero, 1
+    jalr    zero, ra, 0
+
+
+resto_divisao:
+    addi    sp, sp, -8
+    sw      ra, 0(sp)
+    sw      s0, 4(sp)
+
+    addi    s0, a7, 0
+
+resto_divisao_loop:
+    blt     a0, s0, resto_divisao_fim
+    sub     a0, a0, s0
+    jal     zero, resto_divisao_loop
+
+resto_divisao_fim:
+    lw      ra, 0(sp)
+    lw      s0, 4(sp)
+    addi    sp, sp, 8
+    jalr    zero, ra, 0
+
 
 main:
-    addi    a2, zero, 5     # n = 5
-    addi    a3, zero, 10    # p = 10
+    addi    a0, zero, 7
+    jal     ra, ehprimo
 
-    jal     ra, arranjo
-
-    addi    a7, zero, 10         # exit
+    addi    a7, zero, 10
     ecall

@@ -4,23 +4,33 @@
 # Grupo: Gabriel Henrique de Freitas e João Matheus Cachoeira
 
     .text
+    jal     zero, main
+
 main:
-    addi    t0, zero, 5     # t0 = 5 valor para calcular o fatorial
+    addi    a6, zero, 45
+    addi    a7, zero, 4
+    jal     ra, resto_divisao
+    
+    addi    a7, zero, 1
+    ecall
 
-    jal     ra, fatorial    # chama a função fatorial e salva retorno em ra
+    addi    a7, zero, 10
+    ecall
 
-    addi    a7, zero, 10    # código de saída exit para o ecall
-    ecall                   # chama o sistema e finaliza
+resto_divisao:
+    addi    sp, sp, -4
+    sw      s0, 0(sp)
 
-fatorial:
-    addi    a0, zero, 1     # a0 = 1 acumulador do resultado
+    addi    a0, a6, 0
+    addi    s0, a7, 0
 
-fatorial_loop:
-    beq     t0, zero, fatorial_fim      # se t0 == 0 desvia para fim da função   
+resto_divsao_loop:
+    blt     a0, s0, resto_divisao_fim
+    sub     a0, a0, s0
+    jal     zero, resto_divsao_loop
 
-    mul     a0, a0, t0      # # a0 = a0 * t0
-    addi    t0, t0, -1    # t0 = t0 - 1
-    jal     zero, fatorial_loop     # volta para início do loop
+resto_divisao_fim:
+    lw      s0, 0(sp)
+    addi    sp, sp, 4
 
-fatorial_fim:
-    jalr     zero, ra, 0    # retorna para o endereço salvo em ra
+    jalr    zero, ra, 0

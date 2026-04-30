@@ -1,39 +1,66 @@
 # Disciplina: Arquitetura e Organização de Processadores
 # Atividade: Prática 01 – Programação de procedimentos em linguagem de montagem
-# Programa 02
+# Programa 03
 # Grupo: Gabriel Henrique de Freitas e João Matheus Cachoeira
-   
+
     .text
     jal     zero, main
 
-main:
-    addi    a2, zero, 10
-    addi    a3, zero, 5
+soma_digitos:
+    addi    sp, sp, -8
+    sw      ra, 0(sp)
+    sw      s0, 4(sp)
 
-    jal     ra, mdc
+    addi    s0, a2, 0
 
-    addi    a7, zero, 10         # exit
-    ecall
+    addi    t0, zero, 10
+    blt     s0, t0, caso_base
 
-mdc:
-    addi    sp, sp, -4          # reserva espaço na stack
-    sw      ra, 0(sp)           # salva ra
+    addi    a6, s0, 0
+    addi    a7, zero, 10
+    jal     ra, resto_divisao
 
-    beq     a2, a3, mdc_fim     # if (a==b)          
-    bgt     a2, a3, maior       # if (a>b) 
-    blt     a2, a3, menor
+    addi    t1, a0, 0
 
-menor:
-    sub     a3, a3, a2
-    jal     ra, mdc
-    jal     zero, mdc_fim
+    addi    a2, s0, 0
+    addi    a7, zero, 10
+    div     a2, a2, a7
 
-maior:
-    sub     a2, a2, a3
-    jal     ra, mdc
+    jal     ra, soma_digitos
 
-mdc_fim:
+    add     a0, a0, t1
+    jal     zero, fim_soma
+
+caso_base:
+    addi    a0, s0, 0
+
+fim_soma:
     lw      ra, 0(sp)
+    lw      s0, 4(sp)
+    addi    sp, sp, 8
+    jalr    zero, ra, 0
+
+resto_divisao:
+    addi    sp, sp, -4
+    sw      s0, 0(sp)
+
+    addi    a0, a6, 0
+    addi    s0, a7, 0
+
+resto_divsao_loop:
+    blt     a0, s0, resto_divisao_fim
+    sub     a0, a0, s0
+    jal     zero, resto_divsao_loop
+
+resto_divisao_fim:
+    lw      s0, 0(sp)
     addi    sp, sp, 4
 
-    jalr     zero, ra, 0
+    jalr    zero, ra, 0
+
+main:
+    addi    a2, zero, 255
+    jal     ra, soma_digitos
+
+    addi    a7, zero, 10
+    ecall
